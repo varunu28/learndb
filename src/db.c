@@ -42,6 +42,7 @@ typedef struct {
     ssize_t input_length;
 } InputBuffer;
 
+// MetaCommand are commands that dictate the terminal behavior of database such as closing the database connection
 typedef enum {
     META_COMMAND_SUCCESS,
     META_COMMAND_UNRECOGNIZED_COMMAND
@@ -88,6 +89,7 @@ typedef struct {
 } Cursor;
 // typedef end
 
+// Creates a Cursor implementation that points to the start of page
 Cursor* table_start(Table* table)
 {
     Cursor* cursor = malloc(sizeof(Cursor));
@@ -97,6 +99,7 @@ Cursor* table_start(Table* table)
     return cursor;
 }
 
+// Creates a Cursor implementation that points to the position for next row insertion
 Cursor* table_end(Table* table)
 {
     Cursor* cursor = malloc(sizeof(Cursor));
@@ -106,6 +109,7 @@ Cursor* table_end(Table* table)
     return cursor;
 }
 
+// Update the cursor to point to next row.
 void cursor_advance(Cursor* cursor)
 {
     cursor->row_num += 1;
@@ -115,6 +119,7 @@ void cursor_advance(Cursor* cursor)
     }
 }
 
+// Flush all contents of a page to disk
 void pager_flush(Pager* pager, uint32_t page_num, uint32_t size)
 {
     if (pager->pages[page_num] == NULL)
@@ -136,6 +141,9 @@ void pager_flush(Pager* pager, uint32_t page_num, uint32_t size)
     }
 }
 
+// Close the database connection by doing below steps:
+// - Flush all pages in table on disk.
+// - perform cleanup for memory allocated for database resources.
 void db_close(Table* table)
 {
     Pager* pager = table->pager;
@@ -181,6 +189,7 @@ void db_close(Table* table)
     free(table);
 }
 
+// Create new InputBuffer
 InputBuffer* new_input_buffer()
 {
     InputBuffer* input_buffer = (InputBuffer*)malloc(sizeof(InputBuffer));
@@ -191,6 +200,7 @@ InputBuffer* new_input_buffer()
     return input_buffer;
 }
 
+// Process MetaCommand
 MetaCommandResult do_meta_command(InputBuffer* input_buffer, Table* table)
 {
     if (strcmp(input_buffer->buffer, ".exit") == 0)
@@ -203,6 +213,7 @@ MetaCommandResult do_meta_command(InputBuffer* input_buffer, Table* table)
     }
 }
 
+// Prepare database insertion operation
 PrepareResult prepare_insert(InputBuffer* input_buffer, Statement* statement)
 {
     statement->type = STATEMENT_INSERT;
@@ -234,6 +245,7 @@ PrepareResult prepare_insert(InputBuffer* input_buffer, Statement* statement)
     return PREPARE_SUCCESS;
 }
 
+// Prepare database operation
 PrepareResult prepare_statement(InputBuffer* input_buffer, Statement* statement)
 {
     if (strncmp(input_buffer->buffer, "insert", 6) == 0)
