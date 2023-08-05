@@ -11,7 +11,7 @@ class TestDatabase(unittest.TestCase):
     def run_script(self, commands):
         # start db server
         self.process = subprocess.Popen(
-            ["./src/db", "test.db"],
+            ["./bin/db", "test.db"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
