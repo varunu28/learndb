@@ -18,8 +18,10 @@ typedef struct
 // Creates a Cursor implementation that points to the start of page
 Cursor *table_start(Table *table);
 
-// Creates a Cursor implementation that points to the position for next row insertion
-Cursor *table_end(Table *table);
+/**
+ * Return the position of given key. If key is not present then return the correct insertion position for the key
+ */
+Cursor *table_find(Table *table, uint32_t key);
 
 void *cursor_value(Cursor *cursor);
 

@@ -51,21 +51,21 @@ class TestDatabase(unittest.TestCase):
 
     def test_prints_error_message_when_table_is_full(self):
         self.remove_test_file_if_exists()
-        script = [f"insert {i} user{i} person{i}@example.com" for i in range(1, 1402)]
-        script.append(".exit")
-        result = self.run_script(script)
+        commands = [f"insert {i} user{i} person{i}@example.com" for i in range(1, 1402)]
+        commands.append(".exit")
+        result = self.run_script(commands)
         self.assertEqual(result[-2], "db > error: Table full.")
 
     def test_allows_inserting_strings_that_are_the_maximum_length(self):
         self.remove_test_file_if_exists()
         long_username = "a" * 32
         long_email = "a" * 255
-        script = [
+        commands = [
             f"insert 1 {long_username} {long_email}",
             "select",
             ".exit",
         ]
-        result = self.run_script(script)
+        result = self.run_script(commands)
         self.assertListEqual(
             result,
             [
@@ -80,12 +80,12 @@ class TestDatabase(unittest.TestCase):
         self.remove_test_file_if_exists()
         long_username = "a" * 33
         long_email = "a" * 256
-        script = [
+        commands = [
             f"insert 1 {long_username} {long_email}",
             "select",
             ".exit",
         ]
-        result = self.run_script(script)
+        result = self.run_script(commands)
         self.assertListEqual(
             result,
             [
@@ -97,12 +97,12 @@ class TestDatabase(unittest.TestCase):
 
     def test_prints_an_error_message_if_id_is_negative(self):
         self.remove_test_file_if_exists()
-        script = [
+        commands = [
             "insert -1 cstack foo@bar.com",
             "select",
             ".exit",
         ]
-        result = self.run_script(script)
+        result = self.run_script(commands)
         self.assertListEqual(
             result,
             [
@@ -139,11 +139,11 @@ class TestDatabase(unittest.TestCase):
 
     def test_prints_constants(self):
         self.remove_test_file_if_exists()
-        script = [
+        commands = [
             ".constants",
             ".exit",
         ]
-        result = self.run_script(script)
+        result = self.run_script(commands)
         self.assertListEqual(
             result,
             [
@@ -173,9 +173,29 @@ class TestDatabase(unittest.TestCase):
                 "db > executed.",
                 "db > Tree:",
                 "leaf (size 3)",
-                "  - 0 : 3",
-                "  - 1 : 1",
-                "  - 2 : 2",
+                "  - 0 : 1",
+                "  - 1 : 2",
+                "  - 2 : 3",
+                "db > ",
+            ],
+        )
+
+    def test_error_for_duplicate_id(self):
+        self.remove_test_file_if_exists()
+        commands = [
+            "insert 1 user1 person1@example.com",
+            "insert 1 user1 person1@example.com",
+            "select",
+            ".exit",
+        ]
+        result = self.run_script(commands)
+        self.assertListEqual(
+            result,
+            [
+                "db > executed.",
+                "db > error: Duplicate key.",
+                "db > (1, user1, person1@example.com)",
+                "executed.",
                 "db > ",
             ],
         )
