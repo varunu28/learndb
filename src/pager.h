@@ -1,11 +1,11 @@
 #ifndef PAGER_H
 #define PAGER_H
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#define PAGE_SIZE 4096
-#define TABLE_MAX_PAGES 100
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <errno.h>
+#include "constants.h"
 
 typedef struct
 {

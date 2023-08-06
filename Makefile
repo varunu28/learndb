@@ -32,8 +32,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 # Clean the generated files
 clean:
-	rm test.db
 	rm -rf $(BIN_DIR) $(OBJ_DIR)
+	rm test.db
 
 # Run the Python test
 test:
